@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
 <style>
     :root {
         --vib-blue: #0054A6;
@@ -108,6 +109,7 @@
     .document-page {
         background-color: #ffffff;
         width: 210mm; /* Khổ rộng A4 chuẩn */
+        max-width: 100%;
         min-height: 297mm; /* Khổ cao A4 chuẩn */
         margin: 0 auto;
         padding: 30px 45px 50px 45px;
@@ -201,11 +203,25 @@
         margin-right: 4px;
         white-space: nowrap;
     }
-    .field-input-dotted {
+    .field-input-dotted, .dotted-input {
         flex-grow: 1;
+        border: none;
         border-bottom: 1px dotted #555;
         padding-left: 3px;
         min-height: 16px;
+        background: transparent;
+        font-family: inherit;
+        font-size: inherit;
+        color: inherit;
+        outline: none;
+    }
+    .dotted-input {
+        display: inline-block;
+        width: 100%;
+    }
+    .dotted-input[readonly] {
+        cursor: default;
+        color: inherit;
     }
     .checkbox-group {
         display: flex;
@@ -537,18 +553,18 @@
 <!-- THANH ĐIỀU HƯỚNG & HÀNH ĐỘNG (Không in khi xuất PDF) -->
 <div class="control-toolbar">
     <div class="toolbar-left">
-        <button class="btn-action btn-back" onclick="handleGoBack()">
+        <button type="button" class="btn-action btn-back" onclick="handleGoBack()">
             <i class="fa-solid fa-arrow-left"></i> Quay lại
         </button>
     </div>
     <div class="toolbar-right">
-        <button class="btn-action btn-sign" onclick="openSignatureModal('signature-box-1')">
+        <button type="button" class="btn-action btn-sign" onclick="openSignatureModal('signature-box-1')">
             <i class="fa-solid fa-pen-nib"></i> Ký tên điện tử
         </button>
-        <button class="btn-action btn-download" onclick="window.print()">
+        <button type="button" class="btn-action btn-download" onclick="window.print()">
             <i class="fa-solid fa-file-pdf"></i> In / Xuất File PDF
         </button>
-        <button class="btn-action btn-confirm" onclick="handleFormSubmission()">
+        <button type="button" class="btn-action btn-confirm" onclick="handleFormSubmission()">
             <i class="fa-solid fa-circle-check"></i> Xác nhận & Gửi hồ sơ
         </button>
     </div>
@@ -576,8 +592,8 @@
             </div>
         </div>
 
-        <div class="doc-title">GIẤY ĐỀ NGHỊ VAY VỐN KIÊM PHƯƠNG ÁN TRẢ NỢ</div>
-        <div class="doc-subtitle">(Áp dụng đối với vay tiêu dùng không có tài sản bảo đảm)</div>
+        <h1 class="doc-title">GIẤY ĐỀ NGHỊ VAY VỐN KIÊM PHƯƠNG ÁN TRẢ NỢ</h1>
+        <p class="doc-subtitle">(Áp dụng đối với vay tiêu dùng không có tài sản bảo đảm)</p>
 
         <p style="text-align: justify; font-size: 9.5pt; margin-bottom: 8px; line-height: 1.3;">
             Tôi (“Bên Vay”) đề nghị VIB xem xét cấp khoản tín dụng theo chương trình Vay Tiêu Dùng (“Khoản vay”) với các chi tiết kê khai dưới đây. Tôi cam kết chịu trách nhiệm hoàn toàn trước pháp luật về tính chính xác và chân thực của các thông tin này.<br>
@@ -585,16 +601,16 @@
         </p>
 
         <!-- 1. THÔNG TIN VỀ KHOẢN VAY -->
-        <div class="form-section-title">1. Thông Tin Về Khoản Vay & Phương Án Sử Dụng Vốn</div>
+        <h2 class="form-section-title">1. Thông Tin Về Khoản Vay & Phương Án Sử Dụng Vốn</h2>
         
         <div class="grid-row">
             <div class="col-6 field-wrapper">
                 <span class="field-label">Số tiền đề nghị vay (VNĐ):</span>
-                <span class="field-input-dotted" contenteditable="true" style="font-weight: bold; color: var(--vib-blue);"></span>
+                <input id="loanAmountRequested" class="dotted-input" type="text" placeholder="Nhập thông tin" aria-label="Trường nhập liệu" style="font-weight: bold; color: var(--vib-blue);" readonly />
             </div>
             <div class="col-6 field-wrapper">
                 <span class="field-label">Lãi suất áp dụng hiện hành:</span>
-                <span class="field-input-dotted" contenteditable="true"></span>
+                <input id="loanInterestRate" class="dotted-input" type="text" placeholder="Nhập lãi suất" aria-label="Lãi suất áp dụng hiện hành" readonly />
                 <span class="field-label" style="margin-left: 3px;">%/năm</span>
             </div>
         </div>
@@ -626,7 +642,7 @@
                     <label class="checkbox-item"><input type="checkbox" name="loan-purpose" value="muaxe"> Mua xe</label>
                     <label class="checkbox-item"><input type="checkbox" name="loan-purpose" value="tieudung"> Chi tiêu cá nhân</label>
                     <label class="checkbox-item"><input type="checkbox" name="loan-purpose" value="khac"> Khác (ghi rõ):</label>
-                    <span class="field-input-dotted" contenteditable="true" style="min-width: 100px;"></span>
+                    <input id="loanPurposeOther" class="dotted-input" type="text" placeholder="Nhập thông tin" aria-label="Trường nhập liệu" style="min-width: 100px;" readonly />
                 </div>
             </div>
         </div>
@@ -658,12 +674,12 @@
         </table>
 
         <!-- 2. THÔNG TIN CÁ NHÂN -->
-        <div class="form-section-title">2. Thông Tin Nhân Thân Khách Hàng (Bên Vay)</div>
+        <h2 class="form-section-title">2. Thông Tin Nhân Thân Khách Hàng (Bên Vay)</h2>
 
         <div class="grid-row">
             <div class="col-5 field-wrapper">
                 <span class="field-label">Họ và tên (chữ in hoa):</span>
-                <span class="field-input-dotted" contenteditable="true" style="text-transform: uppercase; font-weight: bold; color: var(--vib-blue);"></span>
+                <input id="borrowerFullName" class="dotted-input" type="text" placeholder="Nhập thông tin" aria-label="Trường nhập liệu" style="text-transform: uppercase; font-weight: bold; color: var(--vib-blue);" readonly />
             </div>
             <div class="col-2 field-wrapper">
                 <span class="field-label">Giới tính:</span>
@@ -674,33 +690,33 @@
             </div>
             <div class="col-3 field-wrapper">
                 <span class="field-label">Ngày sinh:</span>
-                <span class="field-input-dotted" contenteditable="true"></span>
+                <input id="borrowerDob" class="dotted-input" type="text" placeholder="Nhập ngày sinh" aria-label="Ngày sinh" readonly />
             </div>
             <div class="col-2 field-wrapper">
                 <span class="field-label">Nơi sinh:</span>
-                <span class="field-input-dotted" contenteditable="true"></span>
+                <input id="borrowerBirthPlace" class="dotted-input" type="text" placeholder="Nhập nơi sinh" aria-label="Nơi sinh" readonly />
             </div>
         </div>
 
         <div class="grid-row">
             <div class="col-6 field-wrapper">
                 <span class="field-label">Số CCCD/ Hộ chiếu hiện tại:</span>
-                <span class="field-input-dotted" contenteditable="true" style="font-weight: bold;"></span>
+                <input id="borrowerIdNumber" class="dotted-input" type="text" placeholder="Nhập thông tin" aria-label="Trường nhập liệu" style="font-weight: bold;" readonly />
             </div>
             <div class="col-3 field-wrapper">
                 <span class="field-label">Ngày cấp:</span>
-                <span class="field-input-dotted" contenteditable="true"></span>
+                <input id="borrowerIssueDate" class="dotted-input" type="text" placeholder="Nhập ngày cấp" aria-label="Ngày cấp" readonly />
             </div>
             <div class="col-3 field-wrapper">
                 <span class="field-label">Nơi cấp:</span>
-                <span class="field-input-dotted" contenteditable="true"></span>
+                <input id="borrowerIssuePlace" class="dotted-input" type="text" placeholder="Nhập nơi cấp" aria-label="Nơi cấp" readonly />
             </div>
         </div>
 
         <div class="grid-row">
             <div class="col-12 field-wrapper">
                 <span class="field-label">Số CMND/CCCD trước đây (nếu có):</span>
-                <span class="field-input-dotted" contenteditable="true" style="margin-right: 20px; flex-grow: 0; min-width: 150px;"></span>
+                <input class="dotted-input" type="text" placeholder="Nhập thông tin" aria-label="Trường nhập liệu" style="margin-right: 20px; flex-grow: 0; min-width: 150px;" />
                 <span class="field-label">Trình độ học vấn:</span>
                 <div class="checkbox-group">
                     <label class="checkbox-item"><input type="radio" name="education" value="thpt"> THPT</label>
@@ -714,39 +730,39 @@
         <div class="grid-row">
             <div class="col-12 field-wrapper">
                 <span class="field-label">Địa chỉ đăng ký thường trú (Theo hộ khẩu):</span>
-                <span class="field-input-dotted" contenteditable="true"></span>
+                <input id="borrowerRegisterAddress" class="dotted-input" type="text" placeholder="Nhập địa chỉ thường trú" aria-label="Địa chỉ đăng ký thường trú" readonly />
             </div>
         </div>
 
         <div class="grid-row">
             <div class="col-12 field-wrapper">
                 <span class="field-label">Địa chỉ cư trú hiện tại:</span>
-                <span class="field-input-dotted" contenteditable="true"></span>
+                <input id="borrowerCurrentAddress" class="dotted-input" type="text" placeholder="Nhập địa chỉ cư trú hiện tại" aria-label="Địa chỉ cư trú hiện tại" readonly />
             </div>
         </div>
 
         <div class="grid-row">
             <div class="col-5 field-wrapper">
                 <span class="field-label">Thời gian ở địa chỉ hiện tại từ:</span>
-                <span class="field-input-dotted" contenteditable="true" style="max-width: 50px;"></span>
+                <input class="dotted-input" type="text" placeholder="Nhập năm" aria-label="Năm cư trú hiện tại" style="max-width: 50px;" />
                 <span class="field-label" style="font-weight:normal; margin-left:2px;">Năm</span>
-                <span class="field-input-dotted" contenteditable="true" style="max-width: 50px;"></span>
+                <input class="dotted-input" type="text" placeholder="Nhập tháng" aria-label="Tháng cư trú hiện tại" style="max-width: 50px;" />
                 <span class="field-label" style="font-weight:normal; margin-left:2px;">Tháng</span>
             </div>
             <div class="col-4 field-wrapper">
                 <span class="field-label">Điện thoại di động:</span>
-                <span class="field-input-dotted" contenteditable="true" style="font-weight:bold;"></span>
+                <input id="borrowerPhoneMobile" class="dotted-input" type="text" placeholder="Nhập số điện thoại" aria-label="Điện thoại di động" style="font-weight:bold;" readonly />
             </div>
             <div class="col-3 field-wrapper">
                 <span class="field-label">Điện thoại nhà riêng:</span>
-                <span class="field-input-dotted" contenteditable="true"></span>
+                <input class="dotted-input" type="text" placeholder="Nhập điện thoại nhà riêng" aria-label="Điện thoại nhà riêng" />
             </div>
         </div>
 
         <div class="grid-row">
             <div class="col-12 field-wrapper">
                 <span class="field-label">Nếu thời gian cư trú hiện tại dưới 3 năm, ghi địa chỉ cư trú trước đây:</span>
-                <span class="field-input-dotted" contenteditable="true"></span>
+                <input class="dotted-input" type="text" placeholder="Nhập địa chỉ trước đây" aria-label="Địa chỉ cư trú trước đây" />
             </div>
         </div>
 
@@ -761,7 +777,7 @@
             </div>
             <div class="col-6 field-wrapper">
                 <span class="field-label">Số người phụ thuộc:</span>
-                <span class="field-input-dotted" contenteditable="true" style="max-width: 50px;"></span>
+                <input class="dotted-input" type="text" placeholder="Nhập số người" aria-label="Số người phụ thuộc" style="max-width: 50px;" />
                 <span class="field-label" style="font-weight:normal; margin-left:2px;">người</span>
             </div>
         </div>
@@ -769,59 +785,59 @@
         <div class="grid-row">
             <div class="col-6 field-wrapper">
                 <span class="field-label">Thông tin Vợ/Chồng (nếu có) - Họ tên:</span>
-                <span class="field-input-dotted" contenteditable="true"></span>
+                <input class="dotted-input" type="text" placeholder="Nhập họ tên vợ/chồng" aria-label="Họ tên vợ/chồng" />
             </div>
             <div class="col-6 field-wrapper">
                 <span class="field-label">Số CCCD/HC:</span>
-                <span class="field-input-dotted" contenteditable="true"></span>
+                <input class="dotted-input" type="text" placeholder="Nhập số CCCD/HC vợ/chồng" aria-label="Số CCCD/HC vợ/chồng" />
             </div>
         </div>
         <div class="grid-row">
              <div class="col-6 field-wrapper">
                 <span class="field-label">Nơi làm việc của Vợ/Chồng:</span>
-                <span class="field-input-dotted" contenteditable="true"></span>
+                <input class="dotted-input" type="text" placeholder="Nhập nơi làm việc" aria-label="Nơi làm việc của vợ/chồng" />
             </div>
              <div class="col-6 field-wrapper">
                 <span class="field-label">SĐT nơi làm việc/SĐT di động:</span>
-                <span class="field-input-dotted" contenteditable="true"></span>
+                <input class="dotted-input" type="text" placeholder="Nhập số điện thoại" aria-label="SĐT nơi làm việc/SĐT di động" />
             </div>
         </div>
 
         <!-- 3. THÔNG TIN NGHỀ NGHIỆP -->
-        <div class="form-section-title">3. Thông Tin Nghề Nghiệp Và Thu Nhập</div>
+        <h2 class="form-section-title">3. Thông Tin Nghề Nghiệp Và Thu Nhập</h2>
 
         <div class="grid-row">
             <div class="col-8 field-wrapper">
                 <span class="field-label">Tên Cơ quan/Tổ chức công tác hiện tại:</span>
-                <span class="field-input-dotted" contenteditable="true" style="font-weight:bold;"></span>
+                <input class="dotted-input" type="text" placeholder="Nhập tên cơ quan" aria-label="Tên cơ quan/tổ chức công tác hiện tại" style="font-weight:bold;" />
             </div>
             <div class="col-4 field-wrapper">
                 <span class="field-label">Chức vụ/Chức danh:</span>
-                <span class="field-input-dotted" contenteditable="true"></span>
+                <input class="dotted-input" type="text" placeholder="Nhập chức vụ" aria-label="Chức vụ/chức danh" />
             </div>
         </div>
 
         <div class="grid-row">
             <div class="col-12 field-wrapper">
                 <span class="field-label">Địa chỉ Cơ quan/Tổ chức:</span>
-                <span class="field-input-dotted" contenteditable="true"></span>
+                <input class="dotted-input" type="text" placeholder="Nhập địa chỉ cơ quan" aria-label="Địa chỉ cơ quan/tổ chức" />
             </div>
         </div>
 
         <div class="grid-row">
             <div class="col-4 field-wrapper">
                 <span class="field-label">Điện thoại Cơ quan:</span>
-                <span class="field-input-dotted" contenteditable="true"></span>
+                <input class="dotted-input" type="text" placeholder="Nhập số điện thoại cơ quan" aria-label="Điện thoại cơ quan" />
             </div>
             <div class="col-3 field-wrapper">
                 <span class="field-label">Phòng ban:</span>
-                <span class="field-input-dotted" contenteditable="true"></span>
+                <input class="dotted-input" type="text" placeholder="Nhập phòng ban" aria-label="Phòng ban" />
             </div>
             <div class="col-5 field-wrapper">
                 <span class="field-label">Thời gian công tác tại đây:</span>
-                 <span class="field-input-dotted" contenteditable="true" style="max-width: 40px;"></span>
+                 <input class="dotted-input" type="text" placeholder="Nhập năm" aria-label="Năm công tác" style="max-width: 40px;" />
                 <span class="field-label" style="font-weight:normal; margin-left:2px;">Năm</span>
-                <span class="field-input-dotted" contenteditable="true" style="max-width: 40px;"></span>
+                <input class="dotted-input" type="text" placeholder="Nhập tháng" aria-label="Tháng công tác" style="max-width: 40px;" />
                 <span class="field-label" style="font-weight:normal; margin-left:2px;">Tháng</span>
             </div>
         </div>
@@ -833,24 +849,24 @@
                     <label class="checkbox-item"><input type="radio" name="contract-type" value="khong_xac_dinh"> KTH</label>
                     <label class="checkbox-item"><input type="radio" name="contract-type" value="co_xac_dinh"> Có TH</label>
                     <label class="checkbox-item"><input type="radio" name="contract-type" value="khac"> Khác:</label>
-                     <span class="field-input-dotted" contenteditable="true" style="min-width: 50px;"></span>
+                     <input class="dotted-input" type="text" placeholder="Nhập" aria-label="Trường nhập liệu" style="min-width: 50px;" />
                 </div>
             </div>
             <div class="col-6 field-wrapper">
                 <span class="field-label">Thu nhập hàng tháng sau thuế (VNĐ):</span>
-                <span class="field-input-dotted" contenteditable="true" style="font-weight:bold; color:var(--vib-blue);"></span>
+                <input id="borrowerMonthlyIncome" class="dotted-input" type="text" placeholder="Nhập thông tin" aria-label="Trường nhập liệu" style="font-weight:bold; color:var(--vib-blue);" readonly />
             </div>
         </div>
         <div class="grid-row">
             <div class="col-12 field-wrapper">
                 <span class="field-label">Nguồn thu nhập khác (nếu có, ví dụ: cho thuê nhà, xe... - ghi rõ số tiền và nguồn):</span>
-                <span class="field-input-dotted" contenteditable="true"></span>
+                <input class="dotted-input" type="text" placeholder="Nhập nguồn thu nhập khác" aria-label="Nguồn thu nhập khác" />
             </div>
         </div>
         <div class="grid-row">
             <div class="col-12 field-wrapper">
                 <span class="field-label">Chi phí sinh hoạt bình quân hàng tháng (bao gồm chi phí cho người phụ thuộc):</span>
-                <span class="field-input-dotted" contenteditable="true"></span>
+                <input class="dotted-input" type="text" placeholder="Nhập chi phí sinh hoạt" aria-label="Chi phí sinh hoạt bình quân" />
             </div>
         </div>
 
@@ -874,7 +890,7 @@
         </div>
 
         <!-- 4. THÔNG TIN VỀ NGƯỜI CÓ LIÊN QUAN -->
-        <div class="form-section-title">4. Thông Tin Về Người Có Liên Quan</div>
+        <h2 class="form-section-title">4. Thông Tin Về Người Có Liên Quan</h2>
         <p style="font-size: 8.5pt; text-align: justify; margin-bottom: 5px; color: #444;">
            <strong>Các nội dung Người có liên quan của một cá nhân được định nghĩa như sau:</strong><br>
             (a) Vợ, chồng, cha, mẹ, con (bao gồm cả cha nuôi, mẹ nuôi, con nuôi, bố chồng (bố vợ), mẹ chồng (mẹ vợ), con dâu(con rể); bố dượng, mẹ kế, con riêng của vợ hoặc chồng), anh ruột, chị ruột, em ruột, (bao gồm cả anh, chị, em cùng mẹ khác cha hoặc cùng cha khác mẹ), anh rể, chị dâu, em dâu, em rể của NGƯỜI KÊ KHAI.<br>
@@ -938,7 +954,7 @@
         </table>
 
         <!-- 5. TÀI KHOẢN VÀ PHƯƠNG THỨC GIẢI NGÂN -->
-        <div class="form-section-title">5. Tài Khoản & Phương Thức Giải Ngân</div>
+        <h2 class="form-section-title">5. Tài Khoản & Phương Thức Giải Ngân</h2>
         <p style="font-size: 9pt; text-align: justify; margin-bottom: 8px;">
             Khoản vay được chấp thuận sẽ được giải ngân vào tài khoản của Quý khách tại Ngân hàng VIB (được nêu dưới đây hoặc được VIB cung cấp sau khi khách hàng hoàn tất đơn yêu cầu mở tài khoản thanh toán);<br>
             Khoản vay được chấp thuận sẽ chỉ được trả vào tài khoản giao dịch VNĐ tại VIB của khách hàng và không bằng tiền mặt. Khách hàng có trách nhiệm cung cấp các giấy tờ hỗ trợ theo yêu cầu của VIB tùy thuộc vào số tiền vay và mục đích vay. Giấy tờ bao gồm nhưng không giới hạn, hợp đồng mua bán, báo giá, hợp đồng xây sửa nhà, hóa đơn, phiếu thu. Nếu khách hàng chưa có tài khoản giao dịch VNĐ tại VIB, khách hàng phải nộp đơn yêu cầu mở tài khoản theo mẫu của VIB cung cấp. Tài khoản này sẽ được mở khi khoản vay tiêu dùng của khách hàng được chấp thuận và số tài khoản sẽ được thông báo đến khách hàng trong Hợp đồng tín dụng.
@@ -947,13 +963,13 @@
         <div class="grid-row">
             <div class="col-12 field-wrapper">
                 <span class="field-label">Số tài khoản thanh toán tại VIB (nếu đã có):</span>
-                <span class="field-input-dotted" contenteditable="true" style="font-weight: bold; letter-spacing: 1px;"></span>
+                <input id="bankAccountNumber" class="dotted-input" type="text" placeholder="Nhập thông tin" aria-label="Trường nhập liệu" style="font-weight: bold; letter-spacing: 1px;" readonly />
             </div>
         </div>
         <div class="grid-row">
             <div class="col-12 field-wrapper">
                 <span class="field-label">Chi nhánh/Phòng giao dịch mở tài khoản:</span>
-                <span class="field-input-dotted" contenteditable="true"></span>
+                <input id="bankBranch" class="dotted-input" type="text" placeholder="Nhập chi nhánh/PGD" aria-label="Chi nhánh/Phòng giao dịch mở tài khoản" readonly />
             </div>
         </div>
 
@@ -976,7 +992,7 @@
         </div>
 
         <!-- 6. CAM KẾT CỦA BÊN VAY -->
-        <div class="form-section-title">6. Cam Kết Của Khách Hàng (Bên Vay)</div>
+        <h2 class="form-section-title">6. Cam Kết Của Khách Hàng (Bên Vay)</h2>
         <div style="font-size: 9pt; text-align: justify; line-height: 1.4;">
             <p style="margin-top: 0; margin-bottom: 5px;">Bằng việc ký vào Giấy Đề Nghị Vay Vốn Kiêm Phương Án Trả Nợ Vay Tiêu Dùng này, tôi xác nhận và đồng ý như sau:</p>
             <ul style="margin-top: 5px; padding-left: 20px; margin-bottom: 10px;">
@@ -1029,11 +1045,11 @@
             <div class="grid-row">
                 <div class="col-6 field-wrapper">
                     <span class="field-label">Ngày nhận hồ sơ:</span>
-                    <span class="field-input-dotted" contenteditable="true"></span>
+                    <input class="dotted-input" type="text" placeholder="Nhập ngày nhận hồ sơ" aria-label="Ngày nhận hồ sơ" />
                 </div>
                 <div class="col-6 field-wrapper">
                     <span class="field-label">Mã số nhân viên tiếp nhận:</span>
-                    <span class="field-input-dotted" contenteditable="true"></span>
+                    <input class="dotted-input" type="text" placeholder="Nhập mã số nhân viên" aria-label="Mã số nhân viên tiếp nhận" />
                 </div>
             </div>
             
@@ -1084,24 +1100,24 @@
 
 <!-- MODAL BẢNG KÝ TÊN -->
 <div class="modal-overlay" id="signatureModal">
-    <div class="signature-modal">
+    <div class="signature-modal" role="dialog" aria-modal="true" aria-labelledby="signatureModalTitle">
         <div class="modal-header">
-            <h3 class="modal-title"><i class="fa-solid fa-pen-nib"></i> Bảng Ký Tên Số Hóa</h3>
-            <button class="modal-close" onclick="closeSignatureModal()"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="modal-title" id="signatureModalTitle"><i class="fa-solid fa-pen-nib"></i> Bảng Ký Tên Số Hóa</h3>
+            <button type="button" class="modal-close" onclick="closeSignatureModal()"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div class="modal-body">
             <p style="font-size: 13px; color: #64748b; margin-bottom: 12px; text-align: left;">Sử dụng chuột hoặc ngón tay (trên màn hình cảm ứng) để ký vào ô bên dưới.</p>
             <div class="canvas-container">
-                <canvas id="signature-canvas"></canvas>
+                <canvas id="signature-canvas" aria-label="Khu vực ký tên" role="img"></canvas>
                 <div class="canvas-instruction" id="canvas-instruction">Ký tại đây</div>
             </div>
         </div>
         <div class="modal-footer">
-            <button class="btn-modal btn-clear" onclick="clearCanvas()">
+            <button type="button" class="btn-modal btn-clear" onclick="clearCanvas()">
                 <i class="fa-solid fa-eraser"></i> Xóa chữ ký
             </button>
             <div style="display: flex; gap: 8px;">
-                <button class="btn-modal btn-save-sig" onclick="saveSignature()">
+                <button type="button" class="btn-modal btn-save-sig" onclick="saveSignature()">
                     <i class="fa-solid fa-check"></i> Áp dụng chữ ký
                 </button>
             </div>
@@ -1110,14 +1126,14 @@
 </div>
 
 <!-- CUSTOM NOTIFICATION MODAL -->
-<div class="notif-overlay" id="notifModal">
+<div class="notif-overlay" id="notifModal" role="alertdialog" aria-live="polite">
     <div class="notif-modal">
         <div class="notif-icon">
             <i class="fa-solid fa-check"></i>
         </div>
         <h3 class="notif-title" id="notifTitle">Thành công!</h3>
         <p class="notif-desc" id="notifDesc">Thao tác đã được thực hiện thành công.</p>
-        <button class="btn-notif-confirm" onclick="closeNotifModal()">Đóng</button>
+        <button type="button" class="btn-notif-confirm" onclick="closeNotifModal()">Đóng</button>
     </div>
 </div>
 
@@ -1285,7 +1301,141 @@
 
         // Mô phỏng quá trình gửi dữ liệu
         showNotification("Gửi Hồ Sơ Thành Công!", "Giấy đề nghị vay vốn của Quý khách đã được lưu và chuyển đến hệ thống xét duyệt của VIB.", "success");
+        setTimeout(() => {
+            window.location.href = 'step7.html';
+        }, 1400);
     }
+
+    const SECRET_KEY = 'fecredit-secret-key-v1';
+
+    function formatCurrency(value) {
+        if (value === undefined || value === null || value === '') return '';
+        const amount = Number(String(value).replace(/[^0-9.-]+/g, ''));
+        return isNaN(amount) ? '' : amount.toLocaleString('vi-VN') + ' VNĐ';
+    }
+
+    function setCheckboxValue(name, value) {
+        const inputs = document.querySelectorAll(`input[name="${name}"]`);
+        inputs.forEach(input => {
+            if (input.value === String(value)) {
+                input.checked = true;
+            }
+        });
+    }
+
+    function setPurposeCheckbox(purposeValue) {
+        const mapping = {
+            business: 'suanha',
+            personal: 'tieudung',
+            education: 'hoctap',
+            medical: 'khac',
+            home: 'muaxe',
+            vehicle: 'muaxe',
+            debt: 'khac',
+            other: 'khac'
+        };
+        const targetValue = mapping[purposeValue] || 'khac';
+        setCheckboxValue('loan-purpose', targetValue);
+        if (purposeValue === 'other') {
+            const otherNode = document.getElementById('loanPurposeOther');
+            if (otherNode) otherNode.value = 'Khác';
+        }
+        const loanTypeText = {
+            business: 'Kinh doanh',
+            personal: 'Chi tiêu cá nhân',
+            education: 'Học tập',
+            medical: 'Y tế',
+            home: 'Mua nhà/đất',
+            vehicle: 'Mua xe',
+            debt: 'Trả nợ',
+            other: 'Khác'
+        };
+        const otherInput = document.getElementById('loanPurposeOther');
+        if (otherInput && targetValue === 'khac') {
+            otherInput.value = loanTypeText[purposeValue] || '';
+        }
+    }
+
+    function populateStep6Fields(userData) {
+        const values = {
+            loanAmountRequested: formatCurrency(userData.loanAmount),
+            loanInterestRate: userData.interestRate ? `${userData.interestRate}%` : '',
+            borrowerFullName: userData.fullName || '',
+            borrowerDob: userData.dob || '',
+            borrowerBirthPlace: userData.birthPlace || '',
+            borrowerIdNumber: userData.cccd || '',
+            borrowerIssueDate: userData.issueDate || '',
+            borrowerIssuePlace: userData.issuePlace || '',
+            borrowerRegisterAddress: userData.contactAddress || '',
+            borrowerCurrentAddress: userData.contactAddress || '',
+            borrowerPhoneMobile: userData.phone || '',
+            borrowerMonthlyIncome: formatCurrency(userData.monthlyIncome),
+            bankAccountNumber: userData.accountNumber || '',
+            bankBranch: (function() {
+                const bankLabels = {
+                    shinhan: 'Ngân hàng Shinhan Việt Nam (Shinhanbank)',
+                    vietcombank: 'Ngân hàng TMCP Ngoại Thương Việt Nam (Vietcombank)',
+                    vietinbank: 'Ngân hàng TMCP Công Thương Việt Nam (VietinBank)',
+                    bidv: 'Ngân hàng TMCP Đầu tư và Phát triển Việt Nam (BIDV)',
+                    vib: 'Ngân hàng TMCP Kỹ Thương Việt Nam (VIB)',
+                    agribank: 'Ngân hàng Nông nghiệp và Phát triển Nông thôn Việt Nam (Agribank)',
+                    mbbank: 'Ngân hàng TMCP Quân đội (MB Bank)',
+                    vpbank: 'Ngân hàng TMCP Việt Nam Thịnh Vượng (VPBank)',
+                    acb: 'Ngân hàng TMCP Á Châu (ACB)',
+                    sacombank: 'Ngân hàng TMCP Sài Gòn Thương Tín (Sacombank)'
+                };
+                return bankLabels[userData.bankName] || userData.bankName || '';
+            })()
+        };
+
+        Object.keys(values).forEach(id => {
+            const input = document.getElementById(id);
+            if (input) input.value = values[id];
+        });
+
+        if (userData.loanTerm) {
+            setCheckboxValue('loan-term', userData.loanTerm);
+        }
+        if (userData.gender) {
+            const genderValue = userData.gender === 'Nữ' ? 'Nu' : userData.gender;
+            setCheckboxValue('gender', genderValue);
+        }
+        if (userData.purpose) {
+            setPurposeCheckbox(userData.purpose);
+        }
+
+        const allTextInputs = document.querySelectorAll('input[type="text"]');
+        allTextInputs.forEach(input => {
+            input.readOnly = true;
+        });
+        const allRadios = document.querySelectorAll('input[type="checkbox"], input[type="radio"]');
+        allRadios.forEach(input => {
+            input.disabled = true;
+        });
+    }
+
+    function loadStep6Data() {
+        const encryptedData = localStorage.getItem('userData');
+        if (!encryptedData) {
+            showNotification('Lỗi dữ liệu', 'Không tìm thấy dữ liệu đăng ký. Vui lòng quay lại bước trước.', 'warning');
+            return;
+        }
+
+        try {
+            const decrypted = CryptoJS.AES.decrypt(encryptedData, SECRET_KEY).toString(CryptoJS.enc.Utf8);
+            const userData = JSON.parse(decrypted);
+            if (!userData || !userData.fullName) {
+                showNotification('Lỗi dữ liệu', 'Dữ liệu đăng ký không hợp lệ. Vui lòng quay lại bước trước.', 'warning');
+                return;
+            }
+            populateStep6Fields(userData);
+        } catch (error) {
+            console.error('Không thể giải mã dữ liệu:', error);
+            showNotification('Lỗi dữ liệu', 'Không thể đọc dữ liệu đăng ký. Vui lòng thử lại hoặc quay lại bước trước.', 'warning');
+        }
+    }
+
+    window.addEventListener('load', loadStep6Data);
 </script>
 
 </body>
